@@ -5,10 +5,11 @@
       <map>
         <entry key="..\:/E/PersonalProjects/ImageToText/app/src/main/res/layout/activity_main.xml" value="0.4175" />
         <entry key="..\:/E/PersonalProjects/ImageToText/app/src/main/res/layout/content_main.xml" value="0.41625" />
+        <entry key="..\:/E/PersonalProjects/ImageToTextGit/imagetotext/ImageToText/app/src/main/res/layout/content_main.xml" value="0.4375" />
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_X" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

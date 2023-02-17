@@ -1,70 +1,105 @@
 {
   "project_info": {
-    "project_number": "243400304404",
-    "firebase_url": "https://admob-app-id-1226443088.firebaseio.com",
-    "project_id": "admob-app-id-1226443088",
-    "storage_bucket": "admob-app-id-1226443088.appspot.com"
+    "project_number": "803968059852",
+    "firebase_url": "https://gentle-operator-151010.firebaseio.com",
+    "project_id": "gentle-operator-151010",
+    "storage_bucket": "gentle-operator-151010.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:243400304404:android:6f6e440f50676a065cc401",
+        "mobilesdk_app_id": "1:803968059852:android:e73433ba827f5d22",
+        "android_client_info": {
+          "package_name": "com.antoinecampbell.firebase.demo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "803968059852-s0r3j1a73dlmuhm7se9u0cql0sbr2i64.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.antoinecampbell.firebase.demo",
+            "certificate_hash": "3f37f06c344975409946e4d75993519b07b811f3"
+          }
+        },
+        {
+          "client_id": "803968059852-fj5p70qqp9guvbqah2np4m7705ki3itb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6bVTEpWT1edcCDZ9QOJYoXsa37L4WLCM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "803968059852-fj5p70qqp9guvbqah2np4m7705ki3itb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:803968059852:android:8bc5b67bfbbf9605917569",
         "android_client_info": {
           "package_name": "com.app.imagetotext"
         }
       },
       "oauth_client": [
         {
-          "client_id": "243400304404-09pqdm66qac8jlk08h3btat82n9btq4i.apps.googleusercontent.com",
+          "client_id": "803968059852-fj5p70qqp9guvbqah2np4m7705ki3itb.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCUJTs0E3kVW9pfu4zEBMdx9NYmDI7bTyo"
+          "current_key": "AIzaSyD6bVTEpWT1edcCDZ9QOJYoXsa37L4WLCM"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "243400304404-09pqdm66qac8jlk08h3btat82n9btq4i.apps.googleusercontent.com",
+              "client_id": "803968059852-fj5p70qqp9guvbqah2np4m7705ki3itb.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
         }
-      },
-      "admob_app_id": "ca-app-pub-1786194561317410~2534648553"
+      }
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:243400304404:android:2db6f09f70dcafbb",
+        "mobilesdk_app_id": "1:803968059852:android:8910701a91846f66",
         "android_client_info": {
-          "package_name": "com.rakshith.vtu_exam_result"
+          "package_name": "com.rakshith.quicknews"
         }
       },
       "oauth_client": [
         {
-          "client_id": "243400304404-09pqdm66qac8jlk08h3btat82n9btq4i.apps.googleusercontent.com",
+          "client_id": "803968059852-fj5p70qqp9guvbqah2np4m7705ki3itb.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCUJTs0E3kVW9pfu4zEBMdx9NYmDI7bTyo"
+          "current_key": "AIzaSyD6bVTEpWT1edcCDZ9QOJYoXsa37L4WLCM"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "243400304404-09pqdm66qac8jlk08h3btat82n9btq4i.apps.googleusercontent.com",
+              "client_id": "803968059852-fj5p70qqp9guvbqah2np4m7705ki3itb.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
         }
-      },
-      "admob_app_id": "ca-app-pub-1786194561317410~1362809880"
+      }
     }
   ],
   "configuration_version": "1"
