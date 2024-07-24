@@ -104,7 +104,7 @@ class CameraActivity : BaseActivity() {
                 }
 
                 override fun surfaceChanged(p0: SurfaceHolder, p1: Int, p2: Int, p3: Int) {
-                    TODO("Not yet implemented")
+
                 }
 
                 override fun surfaceDestroyed(p0: SurfaceHolder) {
