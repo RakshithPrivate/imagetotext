@@ -22,4 +22,5 @@ jobs:
         run: chmod +x ImageToText/gradlew
 
       - name: Run unit tests
+        working-directory: ImageToText
         run: ./gradlew clean testDebug
