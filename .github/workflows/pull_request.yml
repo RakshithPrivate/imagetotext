@@ -31,4 +31,4 @@ jobs:
 
       - name: Run unit tests
         working-directory: ImageToText
-        run: ./gradlew clean testDebug -Dorg.gradle.java.home=$JAVA_HOME
+        run: ./gradlew clean testDebug -D org.gradle.java.home=$JAVA_HOME
