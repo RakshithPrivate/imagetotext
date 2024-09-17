@@ -40,7 +40,7 @@ class MainActivityNew : AppCompatActivity() {
         //InterstitialAd.load(this,"ca-app-pub-1786194561317410/9296633458", adRequest, object : InterstitialAdLoadCallback() {
             InterstitialAd.load(this,"ca-app-pub-1786194561317410/5015320040", adRequest, object : InterstitialAdLoadCallback() {
             override fun onAdFailedToLoad(adError: LoadAdError) {
-                Log.d(TAG, adError?.message)
+                adError.message.let { Log.d(TAG, it) }
                 mInterstitialAd = null
             }
 
@@ -53,7 +53,7 @@ class MainActivityNew : AppCompatActivity() {
                         Log.d(TAG, "Ad was dismissed.")
                     }
 
-                    override fun onAdFailedToShowFullScreenContent(adError: AdError?) {
+                    override fun onAdFailedToShowFullScreenContent(p0: AdError) {
                         Log.d(TAG, "Ad failed to show.")
                     }
 

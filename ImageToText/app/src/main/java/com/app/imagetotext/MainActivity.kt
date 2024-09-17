@@ -6,15 +6,27 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
+import android.provider.OpenableColumns
 import android.util.Log
 import android.util.SparseArray
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.github.dhaval2404.imagepicker.ImagePicker
-import com.google.android.gms.ads.*
+import androidx.core.content.FileProvider
+import androidx.core.net.toFile
+import com.app.imagetotext.databinding.ActivityMainBinding
+import com.app.imagetotext.databinding.ContentMainBinding
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.vision.Frame
@@ -34,17 +46,25 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileNotFoundException
+import java.io.FileOutputStream
 import java.io.InputStream
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class MainActivity : BaseActivity() {
+    private var _binding : ContentMainBinding? = null
+    private val binding get() = _binding!!
+
     lateinit  var appUpdateManager : AppUpdateManager
 
     var type = -1;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        val activityMainBinding = ActivityMainBinding.inflate(layoutInflater)
+
+        setContentView(activityMainBinding.root)
         setSupportActionBar(findViewById(R.id.toolbar))
 
         title = getString(R.string.app_name)
@@ -64,6 +84,8 @@ class MainActivity : BaseActivity() {
 
         //MediationTestSuite.launch(MainActivity@this);
     }
+
+
 
     var installStateUpdatedListener: InstallStateUpdatedListener =
         object : InstallStateUpdatedListener {
@@ -148,6 +170,18 @@ class MainActivity : BaseActivity() {
         if (appUpdateManager != null) {
             appUpdateManager.unregisterListener(installStateUpdatedListener);
         }
+        _binding = null
+    }
+
+    // Registers a photo picker activity launcher in single-select mode.
+    val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        // Callback is invoked after the user selects a media item or closes the
+        // photo picker.
+        if (uri != null) {
+            handleImage(Activity.RESULT_OK, uri)
+        } else {
+            handleImage(Activity.RESULT_CANCELED)
+        }
     }
 
     fun pickFromGallery(view: View?) {
@@ -156,12 +190,23 @@ class MainActivity : BaseActivity() {
             show()
         }else{
             type = -1
-            ImagePicker.with(this)
-                .galleryOnly()
-                .crop()    //User can only select image from Gallery
-                .start { resultCode, data ->
-                    handleImage(resultCode, data)
-                }
+//            ImagePicker.with(this)
+//                .galleryOnly()
+//                .crop()    //User can only select image from Gallery
+//                .start { resultCode, data ->
+//                    handleImage(resultCode, data)
+//                }
+
+
+
+            // Launch the photo picker and let the user choose only images.
+            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        }
+    }
+    lateinit var photoUri: Uri
+    val takePictureLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { isSuccess: Boolean ->
+        if (isSuccess) {
+            handleImage(Activity.RESULT_OK, photoUri)
         }
     }
 
@@ -171,14 +216,50 @@ class MainActivity : BaseActivity() {
             show()
         }else {
             type = -1
-            ImagePicker.with(this)
-                .cameraOnly()
-                .crop()//User can only select image from Gallery
-                .start { resultCode, data ->
-                    handleImage(resultCode, data)
+//            ImagePicker.with(this)
+//                .cameraOnly()
+//                .crop()//User can only select image from Gallery
+//                .start { resultCode, data ->
+//                    handleImage(resultCode, data)
+//                }
+
+
+
+            val photoFile: File? = try {
+                createImageFile()
+            } catch (ex: Exception) {
+                null
+            }
+
+            photoFile?.let {
+                try{
+                    photoUri = FileProvider.getUriForFile(this, "com.app.imagetotext.fileprovider", it)
+                    takePictureLauncher.launch(photoUri)
+                }catch (ex: Exception) {
+                    null
                 }
+            }
+
         }
     }
+
+    private fun createImageFile(): File {
+        // Create an image file name
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val imageFileName = "JPEG_$timeStamp"
+        val storageDir = getExternalFilesDir(null)
+        return File.createTempFile(imageFileName, ".jpg", storageDir)
+    }
+//    private fun createImageFile(): File? {
+//        val values = ContentValues()
+//        values.put(
+//            MediaStore.Images.Media.DISPLAY_NAME,
+//            "photo_" + System.currentTimeMillis() + ".jpg"
+//        )
+//        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+//        return contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)?.toFile()
+//
+//    }
 
     fun pickFromCamera(view: View?) {
         if(type == -1){
@@ -197,14 +278,13 @@ class MainActivity : BaseActivity() {
 
 
 
-    private fun handleImage(resultCode: Int, data: Intent?) {
+    private fun handleImage(resultCode: Int, fileUri: Uri? = null) {
         if (resultCode == Activity.RESULT_OK) {
             //Image Uri will not be null for RESULT_OK
-            val fileUri = data?.data
             //imgProfile.setImageURI(fileUri)
 
             //You can get File object from intent
-            val file: File? = ImagePicker.getFile(data)
+            val file: File? = fileUri?.let { getFileFromUri(it) }
 
             //You can also get File Path from intent
             //val filePath:String? = ImagePicker.getFilePath(data)
@@ -228,10 +308,39 @@ class MainActivity : BaseActivity() {
                 file?.delete()
             }
 
-        } else if (resultCode == ImagePicker.RESULT_ERROR) {
-            Toast.makeText(this, ImagePicker.getError(data), Toast.LENGTH_SHORT).show()
+        } else if (resultCode == Activity.RESULT_CANCELED) {
+            Toast.makeText(this,"Cancelled", Toast.LENGTH_SHORT).show()
         } else {
             // Toast.makeText(this, "Task Cancelled", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun getFileFromUri(uri: Uri): File? {
+        return try {
+            val inputStream = contentResolver.openInputStream(uri) ?: return null
+            val fileName = getFileNameFromUri(uri) ?: return null
+            val tempFile = File(cacheDir, fileName)
+            val outputStream = FileOutputStream(tempFile)
+
+            inputStream.copyTo(outputStream)
+            outputStream.close()
+            inputStream.close()
+
+            tempFile
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    // Helper function to get the file name from the Uri
+    private fun getFileNameFromUri(uri: Uri): String? {
+        val cursor = contentResolver.query(uri, null, null, null, null)
+        return cursor?.use {
+            if (it.moveToFirst()) {
+                val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                it.getString(nameIndex)
+            } else null
         }
     }
 
@@ -323,13 +432,14 @@ class MainActivity : BaseActivity() {
     private final var TAG = "MCsample"
     private var mInterstitialAd: InterstitialAd? = null
     private fun loadInterstitialAd() {
-        var adRequest = AdRequest.Builder().build()
+        var adRequest = AdRequest.Builder()
+            .build()
 
         //add unit id from admob
         //InterstitialAd.load(this,"ca-app-pub-1786194561317410/9296633458", adRequest, object : InterstitialAdLoadCallback() {
         InterstitialAd.load(this,"ca-app-pub-1786194561317410/5015320040", adRequest, object : InterstitialAdLoadCallback() {
-            override fun onAdFailedToLoad(adError: LoadAdError) {
-                Log.d(TAG, adError?.message)
+        override fun onAdFailedToLoad(adError: LoadAdError) {
+               // Log.d(TAG, adError?.message)
                 mInterstitialAd = null
                 when (type) {
                     1 -> {
@@ -364,7 +474,7 @@ class MainActivity : BaseActivity() {
                         }
                     }
 
-                    override fun onAdFailedToShowFullScreenContent(adError: AdError?) {
+                    override fun onAdFailedToShowFullScreenContent(p0: AdError) {
                         Log.d(TAG, "Ad failed to show.")
                         when (type) {
                             1 -> {
@@ -387,6 +497,8 @@ class MainActivity : BaseActivity() {
             }
         })
     }
+
+
 
     fun show() {
         if (mInterstitialAd != null) {

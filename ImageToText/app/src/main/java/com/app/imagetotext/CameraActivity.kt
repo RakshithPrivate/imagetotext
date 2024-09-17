@@ -1,32 +1,36 @@
 package com.app.imagetotext
 
 import android.Manifest
-import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import android.view.SurfaceHolder
-import android.widget.TextView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import com.app.imagetotext.databinding.ActivityCameraBinding
+import com.app.imagetotext.databinding.ContentCameraBinding
 import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.Detector
 import com.google.android.gms.vision.text.TextBlock
 import com.google.android.gms.vision.text.TextRecognizer
-import kotlinx.android.synthetic.main.content_camera.*
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class CameraActivity : BaseActivity() {
 
+    private var _binding : ActivityCameraBinding? = null
+    private val binding get() = _binding!!
+
+    private var _contentCameraBinding : ContentCameraBinding? = null
+    private val contentCameraBinding get() = _contentCameraBinding!!
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_camera)
+
+        _binding = ActivityCameraBinding.inflate(layoutInflater)
+        _contentCameraBinding = ContentCameraBinding.bind(binding.contentCamera.root)
+
+        setContentView(binding.root)
+
         setSupportActionBar(findViewById(R.id.toolbar))
 
         title = getString(R.string.app_name)
@@ -35,11 +39,19 @@ class CameraActivity : BaseActivity() {
 
         findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
             val intent = Intent(this,DisplayText::class.java)
-            intent.putExtra("imageText",tv_result.text)
+            intent.putExtra("imageText",contentCameraBinding.tvResult.text)
             startActivity(intent)
 
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+        _contentCameraBinding = null
+    }
+
+
 
     /*override fun onCreateOptionsMenu(menu: Menu): Boolean {
 
@@ -78,7 +90,7 @@ class CameraActivity : BaseActivity() {
                 .setAutoFocusEnabled(true)
                 .setRequestedFps(2.0f)
                 .build()
-            surface_camera_preview.holder.addCallback(object : SurfaceHolder.Callback {
+        contentCameraBinding.surfaceCameraPreview.holder.addCallback(object : SurfaceHolder.Callback {
 
 
                 override fun surfaceCreated(p0: SurfaceHolder) {
@@ -97,7 +109,7 @@ class CameraActivity : BaseActivity() {
                             // for ActivityCompat#requestPermissions for more details.
                             return
                         }
-                        mCameraSource.start(surface_camera_preview.holder)
+                        mCameraSource.start(contentCameraBinding.surfaceCameraPreview.holder)
                     } catch (e: Exception) {
 
                     }
@@ -122,14 +134,14 @@ class CameraActivity : BaseActivity() {
                         return
                     }
 
-                    tv_result.post {
+                    contentCameraBinding.tvResult.post {
                         val stringBuilder = StringBuilder()
                         for (i in 0 until items.size()) {
                             val item = items.valueAt(i)
                             stringBuilder.append(item.value)
                             stringBuilder.append("\n")
                         }
-                        tv_result.text = stringBuilder.toString()
+                        contentCameraBinding.tvResult.text = stringBuilder.toString()
                     }
                 }
             })
