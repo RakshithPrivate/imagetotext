@@ -17,6 +17,12 @@ jobs:
           distribution: 'temurin'
           java-version: 17
           cache: 'gradle'
+          
+      - name: Display Java version
+        run: java -version
+        
+      - name: Set up Gradle environment
+        run: echo "JAVA_HOME=$JAVA_HOME"
 
       - name: Grant execute permissions for gradlew
         run: chmod +x ImageToText/gradlew
