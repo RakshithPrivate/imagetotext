@@ -42,7 +42,6 @@ jobs:
           keyPassword: ${{ secrets.ANDROID_DEVS_ALIAS_PASSWORD }}
 
       - name: Setup Authorization with Google Play Store
-        working-directory: ImageToText
         run: echo '${{ secrets.PLAY_AUTH_JSON }}' > service_account.json
 
       - name: Deploy bundle to Google Play
