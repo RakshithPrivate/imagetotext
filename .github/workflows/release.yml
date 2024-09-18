@@ -25,6 +25,9 @@ jobs:
           gradlePath: ImageToText/app/build.gradle
           versionCode: ${{ github.run_number }}
 
+      - name: Grant execute permissions for gradlew
+        run: chmod +x ImageToText/gradlew
+        
       - name: Assemble Release Bundle
         working-directory: ImageToText
         run: ./gradlew bundleRelease
