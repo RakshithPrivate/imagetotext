@@ -30,7 +30,7 @@ jobs:
         run: ./gradlew assembleDebug  # Adjust this command based on your build type
 
       - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: apk-artifact
           path: ImageToText/app/build/outputs/apk/debug/*.apk  # Adjust the path to your APK output
