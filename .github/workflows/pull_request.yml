@@ -1,11 +1,10 @@
-name: Run test
-
 on:
   pull_request:
     branches: [main]
 
 jobs:
-  build:
+  test:
+    name: Unit Test
     runs-on: ubuntu-latest
 
     steps:
@@ -25,7 +24,34 @@ jobs:
 
       - name: Grant execute permissions for gradlew
         run: chmod +x ImageToText/gradlew
-
+        
       - name: Run unit tests
         working-directory: ImageToText
-        run: ./gradlew clean testDebug
+        run: ./gradlew clean testDebug       
+
+      - name: Build APK
+        working-directory: ImageToText
+        run: ./gradlew assembleDebug  # Adjust this command based on your build type
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-artifact
+          path: ImageToText/app/build/outputs/apk/debug/*.apk  # Adjust the path to your APK output
+
+      - name: Send Email to Tester
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com  # Replace with your SMTP server address
+          server_port: 465  # Change if needed
+          username: ${{ secrets.SMTP_USERNAME }}  # Add your SMTP username to GitHub Secrets
+          password: ${{ secrets.SMTP_PASSWORD }}  # Add your SMTP password to GitHub Secrets
+          subject: "New APK Build Available"
+          body: |
+            A new build of the APK is available for testing.
+            You can download it from the following link: 
+            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts 
+            ${{ steps.upload-artifact.outputs.artifact_url }}
+          to: rakshithraj11@gmail.com  # Replace with the tester's email address
+          from: rakshithraj11@gmail.com  # Replace with your email address
+          secure: true 

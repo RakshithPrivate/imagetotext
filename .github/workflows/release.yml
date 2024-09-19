@@ -1,3 +1,5 @@
+name: Deploy To Google Play
+
 on:
   push:
     branches: [main]
@@ -25,29 +27,55 @@ jobs:
       - name: Grant execute permissions for gradlew
         run: chmod +x ImageToText/gradlew
 
-      - name: Build APK
+      - name: Run unit tests
         working-directory: ImageToText
-        run: ./gradlew assembleDebug  # Adjust this command based on your build type
+        run: ./gradlew clean testDebug
+        
+  distribute:
+    name: Distribute bundle to Google Play
+    runs-on: ubuntu-latest
 
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: apk-artifact
-          path: ImageToText/app/build/outputs/apk/debug/*.apk  # Adjust the path to your APK output
+    steps:
+      - uses: actions/checkout@v4
 
-      - name: Send Email to Tester
-        uses: dawidd6/action-send-mail@v3
+      - name: Setup JDK 18
+        uses: actions/setup-java@v4
         with:
-          server_address: smtp.gmail.com  # Replace with your SMTP server address
-          server_port: 465  # Change if needed
-          username: ${{ secrets.SMTP_USERNAME }}  # Add your SMTP username to GitHub Secrets
-          password: ${{ secrets.SMTP_PASSWORD }}  # Add your SMTP password to GitHub Secrets
-          subject: "New APK Build Available"
-          body: |
-            A new build of the APK is available for testing.
-            You can download it from the following link: 
-            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts 
-            ${{ steps.upload-artifact.outputs.artifact_url }}
-          to: rakshithraj11@gmail.com  # Replace with the tester's email address
-          from: rakshithraj11@gmail.com  # Replace with your email address
-          secure: true 
+          distribution: 'temurin'
+          java-version: 18
+          cache: 'gradle'
+
+      - name: Version Bump
+        uses: chkfung/android-version-actions@v1.2.3
+        with:
+          gradlePath: ImageToText/app/build.gradle
+          versionCode: ${{ github.run_number }}
+
+      - name: Grant execute permissions for gradlew
+        run: chmod +x ImageToText/gradlew
+        
+      - name: Assemble Release Bundle
+        working-directory: ImageToText
+        run: ./gradlew bundleRelease
+
+      - name: Sign Release
+        uses: r0adkll/sign-android-release@v1
+        with:
+          releaseDirectory: ImageToText/app/build/outputs/bundle/release
+          signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE }}
+          keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
+          alias: ${{ secrets.ANDROID_DEVS_ALIAS }}
+          keyPassword: ${{ secrets.ANDROID_DEVS_ALIAS_PASSWORD }}
+
+      - name: Setup Authorization with Google Play Store
+        run: echo '${{ secrets.PLAY_AUTH_JSON }}' > service_account.json
+
+      - name: Deploy bundle to Google Play
+        uses: r0adkll/upload-google-play@v1.1.3
+        with:
+          serviceAccountJson: service_account.json
+          packageName: com.app.imagetotext
+          releaseFiles: ImageToText/app/build/outputs/bundle/release/app-release.aab
+          track: 'internal'
+          status: 'completed'
+          whatsNewDirectory: whatsNew/
