@@ -45,7 +45,9 @@ jobs:
           subject: "New APK Build Available"
           body: |
             A new build of the APK is available for testing.
-            You can download it from the following link:
+            You can download it from the following link: 
+            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts 
             ${{ steps.upload-artifact.outputs.artifact_url }}
           to: rakshithraj11@gmail.com  # Replace with the tester's email address
           from: rakshithraj11@gmail.com  # Replace with your email address
+          secure: true 
