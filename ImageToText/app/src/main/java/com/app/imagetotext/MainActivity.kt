@@ -14,6 +14,7 @@ import android.util.Log
 import android.util.SparseArray
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
@@ -36,6 +37,8 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.appupdate.AppUpdateOptions
+import com.google.android.play.core.common.IntentSenderForResultStarter
 import com.google.android.play.core.install.InstallState
 import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
@@ -124,27 +127,45 @@ class MainActivity : BaseActivity() {
     }
 
     private fun requestUpdate(appUpdateManager: AppUpdateManager, appUpdateInfo: AppUpdateInfo) {
+
+        val updateOptions = AppUpdateOptions.newBuilder(AppUpdateType.FLEXIBLE).build()
+
+        val updateFlowResultLauncher = registerForActivityResult(
+            ActivityResultContracts.StartIntentSenderForResult(),
+        ) { result ->
+
+            if (result.resultCode == RESULT_OK) {
+                // Handle successful app update
+            }
+
+        }
+
+        val starter = IntentSenderForResultStarter { intent, _, fillInIntent, flagsMask, flagsValues, _, _ ->
+            val request = IntentSenderRequest.Builder(intent).setFillInIntent(fillInIntent).setFlags(flagsValues, flagsMask).build()
+            updateFlowResultLauncher.launch(request)
+        }
+
         appUpdateManager.startUpdateFlowForResult(
             // Pass the intent that is returned by 'getAppUpdateInfo()'.
             appUpdateInfo,
-            // Or 'AppUpdateType.FLEXIBLE' for flexible updates.
-            AppUpdateType.FLEXIBLE,
             // The current activity making the update request.
-            this,
+            starter,
+            // Or 'AppUpdateType.FLEXIBLE' for flexible updates.
+            updateOptions,
             // Include a request code to later monitor this update request.
             101
         )
     }
 
-     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-         super.onActivityResult(requestCode, resultCode, data)
-         if (requestCode == 101){
-            if (requestCode != RESULT_OK){
-                // If the update is cancelled or fails,
-                // you can request to start the update again.
-            }
-        }
-    }
+//     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//         super.onActivityResult(requestCode, resultCode, data)
+//         if (requestCode == 101){
+//            if (resultCode != RESULT_OK){
+//                // If the update is cancelled or fails,
+//                // you can request to start the update again.
+//            }
+//        }
+//    }
 
     private fun popupSnackbarForCompleteUpdate() {
         val snackbar: Snackbar = Snackbar.make(

@@ -3,7 +3,6 @@ apply plugin: 'kotlin-android'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.appdistribution'
 apply plugin: 'kotlin-kapt'
-
 android {
     compileSdkVersion 34
     buildToolsVersion '34'
@@ -12,8 +11,8 @@ android {
         applicationId "com.app.imagetotext"
         minSdkVersion 22
         targetSdkVersion 34
-        versionCode 15
-        versionName "2"
+        versionCode 10
+        versionName "1"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -129,9 +128,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui-ktx:2.8.0'
     implementation 'com.google.firebase:firebase-ads:23.3.0'
    // implementation 'com.google.android.play:core-ktx:1.8.1'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
+
 
     //implementation 'com.github.dhaval2404:imagepicker:1.7.5'
 //    implementation 'com.github.florent37:inline-activity-result-kotlin:1.0.4'
@@ -139,12 +136,20 @@ dependencies {
 
 
     implementation 'com.google.android.gms:play-services-ads:23.3.0'
-    implementation 'com.google.ads.mediation:facebook:6.17.0.0'
+    implementation 'com.google.ads.mediation:facebook:6.18.0.0'
     implementation 'com.google.android.ads:mediation-test-suite:3.0.0'
     androidTestImplementation 'androidx.test:rules:1.6.1'
 
     implementation 'com.google.android.play:app-update-ktx:2.1.0'
 
+
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'androidx.test:core:1.6.1'
+    testImplementation 'org.mockito:mockito-core:5.13.0'
+   // testImplementation 'org.mockito:mockito-inline:5.2.0'
+
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
 
 }
 //ca-app-pub-1786194561317410~2534648553
@@ -157,4 +162,8 @@ def getProps(path) {
 
     return props
 
+}
+
+tasks.withType(Test) {
+    useJUnit()
 }
